@@ -20,7 +20,7 @@ def calculateVoronoi(verticesPoints, normalsPoints):
         C = A.I.dot(B.T)
         ''''''
         ''' 
-        Checks whether connectivity of Voronoi cell is complete - i.e., is it out of range (how many neighbors does Delaunay tehtrahedron have?):
+        Checks whether connectivity of Voronoi cell is complete - i.e., is it out of range (how many neighbors does Delaunay tehtrahedron have?) and whether its circumcenter is outside the domain:
         '''
         if len(np.unique(tri.neighbors[indx])) == len(tri.neighbors[indx]) and all(tri.neighbors[indx] != -1):
             ''' Is circumcenter outside domain? '''
