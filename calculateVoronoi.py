@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.spatial import Delaunay
 
+''' This script calculates the embedded Voronoi diagram to then use for the shortest path algorithm to compute the centerline. '''
 def calculateVoronoi(verticesPoints, normalsPoints):
     tri = Delaunay(verticesPoints)
     internalVoronoiVertices = []
@@ -34,39 +35,51 @@ def calculateVoronoi(verticesPoints, normalsPoints):
                 oldToNew.append([indx, len(radii)-1])
                 indices.append(indx)
 
+    all_connected = False
     key = np.array(oldToNew)
-    allNeighbors = []
-    ''' Check if connectivity is complete:
-    '''
-    connected_indices=[]
-    internalVoronoiVerticesConnected=[]
-    radiiConnected=[]
-    oldToConnected=[]
-    for indx in indices: 
-        neighborsOld = tri.neighbors[indx]
-        neighborsNew=[]
-        for i in range(0, 4):
-            j = np.where(key[...,0]==neighborsOld[i])
-            neighborsNew.append(key[j,1])
-        sizeMult=1
-        for a in range(0, len(neighborsNew)):
-            sizeMult = sizeMult * neighborsNew[a].size
-        if sizeMult != 0:
-            connected_indices.append(indx)
-            j = np.where(key[...,0]==indx)
-            internalVoronoiVerticesConnected.append(internalVoronoiVertices[key[j[0][0],1]])
-            radiiConnected.append(radii[key[j[0][0],1]])
-            oldToConnected.append([indx, len(radiiConnected)-1])
+    while all_connected == False:
+        oldToConnected = []
+        allNeighbors = []
+        indices_new = []
+        ''' Check if connectivity is complete:
+        '''
+        connected_indices=[]
+        internalVoronoiVerticesConnected=[]
+        radiiConnected=[]
+        for indx in indices: 
+            neighborsOld = tri.neighbors[indx]
+            neighborsNew=[]
+            for i in range(0, 4):
+                j = np.where(key[...,0]==neighborsOld[i])
+                neighborsNew.append(key[j,1])
+            sizeAdd=0
+            for a in range(0, len(neighborsNew)):
+                sizeAdd = sizeAdd + neighborsNew[a].size
+            if sizeAdd != 0: # as long as it has at least one neighbor
+                connected_indices.append(indx)
+                j = np.where(key[...,0]==indx)
+                internalVoronoiVerticesConnected.append(internalVoronoiVertices[key[j[0][0],1]])
+                radiiConnected.append(radii[key[j[0][0],1]])
+                oldToConnected.append([indx, len(radiiConnected)-1])
 
-    ''' Getting the right list of neighbors. '''
-    key = np.array(oldToConnected)
-    for indx in connected_indices:
-        neighborsNew=[]
-        neighborsOld = tri.neighbors[indx]
-        for i in range(0, 4):
-            j = np.where(key[...,0]==neighborsOld[i])
-            if key[j,1].size != 0:
-                neighborsNew.append(key[j,1][0][0])
-        allNeighbors.append(neighborsNew)
+        key = np.array(oldToConnected)
+        ''' Getting the right list of neighbors. '''
+        for indx in connected_indices:
+            neighborsNew=[]
+            neighborsOld = tri.neighbors[indx]
+            for i in range(0, 4):
+                j = np.where(key[...,0]==neighborsOld[i])
+                if key[j,1].size != 0:
+                    neighborsNew.append(key[j,1][0][0])
+            allNeighbors.append(neighborsNew)
+        
+        for i in range(0, len(allNeighbors)):
+            if len(allNeighbors[i]) == 0:
+                all_connected = False
+                indices = connected_indices
+                print(len(allNeighbors))
+                break
+            else:
+                all_connected = True
 
     return internalVoronoiVerticesConnected, radiiConnected, allNeighbors
