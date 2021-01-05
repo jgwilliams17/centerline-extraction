@@ -1,4 +1,5 @@
 import re
+''' This code reads in a .obj object and returns the vertices and normal vectors.'''
 
 def readObj(filename):
 
