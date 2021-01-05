@@ -1,7 +1,10 @@
+# Background:
+Methodology involves computing Voronoi diagram of the vertices extracted from Mesh.obj. This gives the radii and centers of largest inscribed spheres ([reference][1]). We then use Dijkstra's shortest path algorithm to find a path along the centers of the spheres, weighting edges to incentivise keeping in the center of the vessel and minimising path length.
+
 # Install the following Python packages:
 * pip3 install pywavefront
 * pip3 install regex
-* pip3 install eiknoalfm
+* pip3 install dijkstra
 * pip3 install matplotlib==3.1.2
 
 # Get folder ready to run code:
@@ -21,3 +24,5 @@ Here 284 is the inlet and 180 and 2888 are the two outlet points. The numbers co
 
 # Output:
 There will be a plot of the centerline and coordinates will be saved in .csv files. For example, for Bifurcation, they are in **vasculature/Bifurcation/path_Bifurcation.csv**.
+
+[1]: https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.378.9350&rep=rep1&type=pdf
